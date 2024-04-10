@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Heading, Text, VStack, HStack, Image, Button, Input, Select, Stat, StatLabel, StatNumber, useToast } from "@chakra-ui/react";
 import { FaRocket, FaChartLine, FaCog } from "react-icons/fa";
+
+const stockPrices = {
+  AAPL: 100,
+  GOOGL: 200,
+  AMZN: 150,
+  TSLA: 300,
+};
 
 const Index = () => {
   const [balance, setBalance] = useState(10000);
   const [stock, setStock] = useState("AAPL");
   const [quantity, setQuantity] = useState(0);
+  const [price, setPrice] = useState(stockPrices[stock]);
   const toast = useToast();
+
+  useEffect(() => {
+    const interval = setInterval(updateStockPrices, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const updateStockPrices = () => {
+    for (const stock in stockPrices) {
+      const delta = Math.random() * 20 - 10;
+      stockPrices[stock] = Math.max(stockPrices[stock] + delta, 10);
+    }
+    setPrice(stockPrices[stock]);
+  };
 
   const placeOrder = () => {
     if (quantity <= 0) {
@@ -20,8 +41,7 @@ const Index = () => {
       return;
     }
 
-    // Simulating order placement
-    const orderAmount = quantity * 100; // Assuming each stock costs $100
+    const orderAmount = quantity * stockPrices[stock];
     setBalance(balance - orderAmount);
 
     toast({
@@ -52,7 +72,13 @@ const Index = () => {
           </Stat>
 
           <VStack>
-            <Select value={stock} onChange={(e) => setStock(e.target.value)}>
+            <Select
+              value={stock}
+              onChange={(e) => {
+                setStock(e.target.value);
+                setPrice(stockPrices[e.target.value]);
+              }}
+            >
               <option value="AAPL">Apple (AAPL)</option>
               <option value="GOOGL">Google (GOOGL)</option>
               <option value="AMZN">Amazon (AMZN)</option>
@@ -65,6 +91,12 @@ const Index = () => {
               Place Order
             </Button>
           </VStack>
+
+          <Box>
+            <Text fontSize="2xl" fontWeight="bold">
+              Current {stock} Price: ${price.toFixed(2)}
+            </Text>
+          </Box>
         </HStack>
 
         <HStack spacing={8}>
