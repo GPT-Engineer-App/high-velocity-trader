@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Box, Heading, Text, VStack, HStack, Image, Button, Input, Select, Stat, StatLabel, StatNumber, useToast } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack, HStack, Image, Button, Input, Select, Stat, StatLabel, StatNumber, useToast, Radio, RadioGroup } from "@chakra-ui/react";
 import { FaRocket, FaChartLine, FaCog } from "react-icons/fa";
+import Portfolio from "../components/Portfolio";
 
 const stockPrices = {
   AAPL: 100,
@@ -14,6 +15,9 @@ const Index = () => {
   const [stock, setStock] = useState("AAPL");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(stockPrices[stock]);
+  const [orderType, setOrderType] = useState("buy");
+  const [portfolio, setPortfolio] = useState({});
+  const [shortPositions, setShortPositions] = useState({});
   const toast = useToast();
 
   useEffect(() => {
@@ -42,11 +46,18 @@ const Index = () => {
     }
 
     const orderAmount = quantity * stockPrices[stock];
-    setBalance(balance - orderAmount);
+
+    if (orderType === "buy") {
+      setBalance(balance - orderAmount);
+      setPortfolio({ ...portfolio, [stock]: (portfolio[stock] || 0) + quantity });
+    } else {
+      setBalance(balance + orderAmount);
+      setShortPositions({ ...shortPositions, [stock]: (shortPositions[stock] || 0) + quantity });
+    }
 
     toast({
       title: "Order Placed",
-      description: `You bought ${quantity} shares of ${stock}`,
+      description: `You ${orderType === "buy" ? "bought" : "shorted"} ${quantity} shares of ${stock}`,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -87,6 +98,13 @@ const Index = () => {
 
             <Input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} />
 
+            <RadioGroup onChange={setOrderType} value={orderType}>
+              <HStack>
+                <Radio value="buy">Buy</Radio>
+                <Radio value="short">Short</Radio>
+              </HStack>
+            </RadioGroup>
+
             <Button leftIcon={<FaRocket />} colorScheme="blue" onClick={placeOrder}>
               Place Order
             </Button>
@@ -98,6 +116,8 @@ const Index = () => {
             </Text>
           </Box>
         </HStack>
+
+        <Portfolio portfolio={portfolio} shortPositions={shortPositions} />
 
         <HStack spacing={8}>
           <Box>
