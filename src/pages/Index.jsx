@@ -33,7 +33,7 @@ const Index = () => {
   };
 
   const placeOrder = () => {
-    if (quantity === 0) {
+    if (quantity <= 0) {
       toast({
         title: "Invalid Quantity",
         description: "Please enter a valid quantity",
