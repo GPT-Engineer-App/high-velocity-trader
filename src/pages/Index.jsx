@@ -15,7 +15,7 @@ const Index = () => {
   const [stock, setStock] = useState("AAPL");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(stockPrices[stock]);
-  const [orderType, setOrderType] = useState("buy");
+
   const [portfolio, setPortfolio] = useState({});
   const toast = useToast();
 
@@ -33,7 +33,7 @@ const Index = () => {
   };
 
   const placeOrder = () => {
-    if (quantity <= 0) {
+    if (quantity === 0) {
       toast({
         title: "Invalid Quantity",
         description: "Please enter a valid quantity",
@@ -46,13 +46,13 @@ const Index = () => {
 
     const orderAmount = quantity * stockPrices[stock];
 
-    const positionChange = orderType === "buy" ? quantity : -quantity;
-    setBalance(balance - orderAmount * (orderType === "buy" ? 1 : -1));
+    const positionChange = quantity;
+    setBalance(balance - orderAmount * Math.sign(quantity));
     setPortfolio({ ...portfolio, [stock]: (portfolio[stock] || 0) + positionChange });
 
     toast({
       title: "Order Placed",
-      description: `You ${orderType === "buy" ? "bought" : "shorted"} ${quantity} shares of ${stock}`,
+      description: `You ${quantity > 0 ? "bought" : "shorted"} ${Math.abs(quantity)} shares of ${stock}`,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -92,13 +92,6 @@ const Index = () => {
             </Select>
 
             <Input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} />
-
-            <RadioGroup onChange={setOrderType} value={orderType}>
-              <HStack>
-                <Radio value="buy">Buy</Radio>
-                <Radio value="short">Short</Radio>
-              </HStack>
-            </RadioGroup>
 
             <Button leftIcon={<FaRocket />} colorScheme="blue" onClick={placeOrder}>
               Place Order
