@@ -44,7 +44,7 @@ const Index = () => {
       return;
     }
 
-    const orderAmount = quantity * stockPrices[stock];
+    const orderAmount = Math.abs(quantity) * stockPrices[stock];
 
     const positionChange = quantity;
     setBalance(balance - orderAmount * Math.sign(quantity));
@@ -91,7 +91,7 @@ const Index = () => {
               <option value="TSLA">Tesla (TSLA)</option>
             </Select>
 
-            <Input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} />
+            <Input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
 
             <Button leftIcon={<FaRocket />} colorScheme="blue" onClick={placeOrder}>
               Place Order
