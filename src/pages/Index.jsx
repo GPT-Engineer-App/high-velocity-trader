@@ -15,6 +15,7 @@ const Index = () => {
   const [stock, setStock] = useState("AAPL");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(stockPrices[stock]);
+  const [prevPrice, setPrevPrice] = useState(price);
 
   const [portfolio, setPortfolio] = useState({});
   const toast = useToast();
@@ -29,6 +30,7 @@ const Index = () => {
       const delta = Math.random() * 20 - 10;
       stockPrices[stock] = Math.max(stockPrices[stock] + delta, 10);
     }
+    setPrevPrice(price);
     setPrice(stockPrices[stock]);
   };
 
@@ -99,9 +101,14 @@ const Index = () => {
           </VStack>
 
           <Box>
-            <Text fontSize="2xl" fontWeight="bold">
-              Current {stock} Price: ${price.toFixed(2)}
-            </Text>
+            <VStack align="flex-start">
+              <Text fontSize="2xl" fontWeight="bold">
+                Current {stock} Price: ${price.toFixed(2)}
+              </Text>
+              <Text fontSize="xl" color={price >= prevPrice ? "green.500" : "red.500"}>
+                Previous Price: ${prevPrice.toFixed(2)}
+              </Text>
+            </VStack>
           </Box>
         </HStack>
 
