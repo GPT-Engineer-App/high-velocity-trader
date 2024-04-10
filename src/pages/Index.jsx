@@ -17,7 +17,6 @@ const Index = () => {
   const [price, setPrice] = useState(stockPrices[stock]);
   const [orderType, setOrderType] = useState("buy");
   const [portfolio, setPortfolio] = useState({});
-  const [shortPositions, setShortPositions] = useState({});
   const toast = useToast();
 
   useEffect(() => {
@@ -47,13 +46,9 @@ const Index = () => {
 
     const orderAmount = quantity * stockPrices[stock];
 
-    if (orderType === "buy") {
-      setBalance(balance - orderAmount);
-      setPortfolio({ ...portfolio, [stock]: (portfolio[stock] || 0) + quantity });
-    } else {
-      setBalance(balance + orderAmount);
-      setShortPositions({ ...shortPositions, [stock]: (shortPositions[stock] || 0) + quantity });
-    }
+    const positionChange = orderType === "buy" ? quantity : -quantity;
+    setBalance(balance - orderAmount * (orderType === "buy" ? 1 : -1));
+    setPortfolio({ ...portfolio, [stock]: (portfolio[stock] || 0) + positionChange });
 
     toast({
       title: "Order Placed",
@@ -117,7 +112,7 @@ const Index = () => {
           </Box>
         </HStack>
 
-        <Portfolio portfolio={portfolio} shortPositions={shortPositions} />
+        <Portfolio portfolio={portfolio} />
 
         <HStack spacing={8}>
           <Box>
